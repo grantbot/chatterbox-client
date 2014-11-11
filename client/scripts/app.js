@@ -4,15 +4,18 @@ $(document).ready(function() {
   var response;
   var $newMessage;
   var escapedMessage;
-  var rooms = {};
+  var newRooms = {};
+  var currentRooms = {};
 
-  function getDisplayMessages() {
+  function getDisplayMessages(roomName) {
+    roomName === "ALL CHATS" ? roomName = undefined : roomName = roomName;
     $.ajax({
       // always use this url
       url: 'https://api.parse.com/1/classes/chatterbox',
       data: {
         format:'json',
-        order: '-createdAt'
+        order: '-createdAt',
+        where: {"roomname": roomName}
       },
       type: 'GET',
       dataType: 'json',
@@ -29,21 +32,30 @@ $(document).ready(function() {
 
   function displayMessages(messageArray) {
     for (var i=0; i<messageArray.length; i++) {
-      rooms[messageArray[i].roomname] = true;
-
-
+      newRooms[escapeHTML(messageArray[i].roomname)] = true;
       $newMessage = $('<li></li>');
       escapedMessage = escapeHTML(messageArray[i].username + ' says: ' +
         messageArray[i].text);
       $newMessage.html(escapedMessage);
       $('.messages').append($newMessage);
     }
-    console.log(rooms);
+
+    for (var room in newRooms) {
+      if(!(room in currentRooms) && !(/=/.test(room))){
+        $newRoom = $('<button class="roomButton"></button>');
+        $newRoom.html(room);
+        $newRoomOption = $('<option class="roomOption"></option>');
+        $newRoomOption.text(room);
+        $('.roomNav').append($newRoom);
+        $('.roomSelect').append($newRoomOption);
+        currentRooms[room] = true;
+      }
+    }
   }
 
-  function refreshMessages() {
+  function refreshMessages(roomName) {
     clearMessages();
-    getDisplayMessages();
+    getDisplayMessages(roomName);
   }
 
   function clearMessages() {
@@ -58,7 +70,7 @@ $(document).ready(function() {
 
   function postNewMessage (message) {
     var postObject = {
-      roomname: "8th floor",
+      roomname: $( ".roomSelect option:selected" ).text(),
       text: message,
       username: window.location.search.replace(/\?username=/, '')
     };
@@ -92,6 +104,11 @@ $(document).ready(function() {
         postNewMessage($('.input').val());
         $('.input').val('');
       }
+  });
+
+  $('.roomNav').on('click', '.roomButton', function (event) {
+      var thisRoom = $(this).text();
+      refreshMessages(thisRoom);
   });
 
 

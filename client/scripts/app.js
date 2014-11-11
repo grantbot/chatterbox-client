@@ -4,8 +4,12 @@ $(document).ready(function() {
   var response;
   var $newMessage;
   var escapedMessage;
+  var escapedUser;
   var newRooms = {};
   var currentRooms = {};
+  var currentIntervalId;
+  var reloadInterval = 8000;
+  var friends = [];
 
   function getDisplayMessages(roomName) {
     roomName === "ALL CHATS" ? roomName = undefined : roomName = roomName;
@@ -31,13 +35,20 @@ $(document).ready(function() {
   }
 
   function displayMessages(messageArray) {
+    clearMessages();
     for (var i=0; i<messageArray.length; i++) {
       newRooms[escapeHTML(messageArray[i].roomname)] = true;
-      $newMessage = $('<li></li>');
-      escapedMessage = escapeHTML(messageArray[i].username + ' says: ' +
-        messageArray[i].text);
+      escapedUser = escapeHTML(messageArray[i].username);
+      $newMessage = $('<li class=' + escapedUser + '></li>');
+
+      escapedMessage = '<user>' + escapedUser +
+        '</user>' + ': ' + escapeHTML(messageArray[i].text);
+
       $newMessage.html(escapedMessage);
       $('.messages').append($newMessage);
+    }
+    for (var j=0; j<friends.length; j++) {
+      $('.' + friends[j]).css("font-weight", "bold")
     }
 
     for (var room in newRooms) {
@@ -54,7 +65,6 @@ $(document).ready(function() {
   }
 
   function refreshMessages(roomName) {
-    clearMessages();
     getDisplayMessages(roomName);
   }
 
@@ -107,13 +117,23 @@ $(document).ready(function() {
   });
 
   $('.roomNav').on('click', '.roomButton', function (event) {
+      clearInterval(currentIntervalId);
       var thisRoom = $(this).text();
       refreshMessages(thisRoom);
+      currentIntervalId = setInterval(function() { refreshMessages(thisRoom) }, reloadInterval);
   });
 
+  $('.messages').on('click', 'li user', function (event) {
+      friendClass = $(this).text()
+      if (friends.indexOf($(this).text()) === -1) {
+        friends.push($(this).text());
+      }
+      $('.' + friendClass).css("font-weight", "bold")
+
+  });
 
 getDisplayMessages();
-setInterval(refreshMessages, 10000);
+currentIntervalId = setInterval(refreshMessages, reloadInterval);
 
 
 });

@@ -1,0 +1,45 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>chatterbox</title>
+    <link rel="stylesheet" href="styles/styles.css">
+
+    <!-- dependencies -->
+    <script src="bower_components/jquery/jquery.min.js"></script>
+    <script src="bower_components/underscore/underscore-min.js"></script>
+    <script src="bower_components/backbone/backbone.js"></script>
+
+    <!-- your scripts -->
+
+    <script src="env/config.js"></script>
+    <script src="scripts/app-back.js"></script>
+  </head>
+  <body>
+  <!-- <script>document.body.style.backgroundImage="url('http://i255.photobucket.com/albums/hh156/SrPato/Stuff/ugly2.jpg')";</script> -->
+    <div id="main">
+      <h1>chatterbox</h1>
+      <div class='roomNav'>
+        <button class="roomButton">ALL CHATS</button>
+      </div>
+      </br>
+      <!-- Your HTML goes here! -->
+      Post in: <select class="roomSelect"></select>
+      </br>
+      <input type="text" class="input"></input>
+      <button class="postButton">Post!</button>
+      </br></br>
+      <div class="messages"></div>
+    </div>
+
+    <script>
+
+    var collection = new MessageCollection();
+    var collectionView = new MessageCollectionView({model: collection});
+    collection.loadMsgs();
+    setInterval(collection.loadMsgs.bind(collection), 1000);
+
+
+    </script>
+  </body>
+</html>

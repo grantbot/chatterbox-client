@@ -40,10 +40,8 @@ $(document).ready(function() {
       newRooms[escapeHTML(messageArray[i].roomname)] = true;
       escapedUser = escapeHTML(messageArray[i].username);
       $newMessage = $('<li class=' + escapedUser + '></li>');
-
       escapedMessage = '<user>' + escapedUser +
-        '</user>' + ': ' + escapeHTML(messageArray[i].text);
-
+        '</user>' + ': ' + escapeHTML(messageArray[i].text)
       $newMessage.html(escapedMessage);
       $('.messages').append($newMessage);
     }
